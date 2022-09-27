@@ -134,24 +134,40 @@ def select_course(sess):
 	return [link.split("=")[1], courses[int(x) - 1].get("data-title")]
 
 
-def download_folder(sess, folderid):
+def download_folder(sess, folderid, breadcrumb, recursive = False):
+	path = "downloads/"
+
+	for folder in breadcrumb:
+		path += folder + "/"
+
+		if not os.path.exists(path):
+			os.makedirs(path)
+
+
 	r = sess.get('https://sdu.itslearning.com/Folder/processfolder.aspx?FolderID=' + folderid)
-
 	soup = BeautifulSoup(r.text, "html.parser")
-	foldername = soup.find(class_="ccl-pageheader-title").text
-
 	table = soup.find(id="ctl00_ContentPlaceHolder_ProcessFolderGrid_T")
+	trs = table.find_all("tr")
 
-	links = table.find_all("a", class_="GridTitle")
+	for tr in trs:
+		tds = tr.find_all("td")
+		link = tr.find("a", class_="GridTitle")
+		folderid = "0"
 
-	print("Found " + str(len(links)) + " downloadable files.")
-	print("Press any key to continue...")
-	x = input()
+		if link is None:
+			continue
+		
+		img = tds[0].find("img")
 
-	if not os.path.exists(foldername):
-		os.makedirs(foldername)
+		if img is None:
+			continue
 
-	for index, link in enumerate(links):
+		if img.get("alt") == "Folder" and recursive == True:
+			breadcrumb.append(link.text)
+			download_folder(sess, link.get("href").split("=")[1], breadcrumb, True)
+			breadcrumb.pop()
+
+
 		href = link.get("href")
 		filename = link.text
 		r = sess.get(url + href)
@@ -170,10 +186,11 @@ def download_folder(sess, folderid):
 
 		href = link.get("href")
 		r = sess.get("https://resource.itslearning.com" + href)
-		print("Saving (" + str(index + 1) + "/" + str(len(links)) + "): ", filename)
-		foldername
-		with open(foldername + "/" + filename, "wb") as f:
+		print("Saving: ", path + filename)
+		
+		with open(path + filename, "wb") as f:
 			f.write(r.content)
+		
 
 def print_breadcrumb(breadcrumb):
 	print("Path: ", end="")
@@ -192,6 +209,9 @@ def hr():
 if __name__ == "__main__":
 	clear()
 
+	if not os.path.exists("downloads"):
+		os.makedirs("downloads")
+
 	with requests.Session() as sess:
 		login(sess)
 		clear()
@@ -209,7 +229,7 @@ if __name__ == "__main__":
 			hr()
 			folders = list_folder(sess, folderids[-1])
 			hr()
-			x = input("(b)ack/(d)ownload/(q)uit/[number]: ")
+			x = input("(b)ack/(d)ownload/(r)ecursive download/(q)uit/[number]: ")
 
 			if x == "b":
 				if len(folderids) > 1:
@@ -217,7 +237,14 @@ if __name__ == "__main__":
 					breadcrumb.pop()
 			elif x == "d":
 				clear()
-				download_folder(sess, folderids[-1])
+				download_folder(sess, folderids[-1], breadcrumb)
+				print("Finished.")
+				x = input("Press any key...")
+			elif x == "r":
+				clear()
+				download_folder(sess, folderids[-1], breadcrumb, True)
+				print("Finished.")
+				x = input("Press any key...")
 			elif x == "q":
 				exit()
 			else:
