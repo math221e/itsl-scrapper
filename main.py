@@ -212,41 +212,44 @@ if __name__ == "__main__":
 	if not os.path.exists("downloads"):
 		os.makedirs("downloads")
 
-	with requests.Session() as sess:
-		login(sess)
-		clear()
-		course = select_course(sess)
-		folderids = [course[0]]
-		breadcrumb = [course[1]]
-		clear()
-
-		x = ""
-
-		while x != "q":
+	while True:
+		with requests.Session() as sess:
+			login(sess)
 			clear()
-			hr()
-			print_breadcrumb(breadcrumb);
-			hr()
-			folders = list_folder(sess, folderids[-1])
-			hr()
-			x = input("(b)ack/(d)ownload/(r)ecursive download/(q)uit/[number]: ")
+			course = select_course(sess)
+			folderids = [course[0]]
+			breadcrumb = [course[1]]
+			clear()
 
-			if x == "b":
-				if len(folderids) > 1:
-					folderids.pop()
-					breadcrumb.pop()
-			elif x == "d":
+			x = ""
+
+			while x != "q":
 				clear()
-				download_folder(sess, folderids[-1], breadcrumb)
-				print("Finished.")
-				x = input("Press any key...")
-			elif x == "r":
-				clear()
-				download_folder(sess, folderids[-1], breadcrumb, True)
-				print("Finished.")
-				x = input("Press any key...")
-			elif x == "q":
-				exit()
-			else:
-				folderids.append(folders[int(x) - 1][0])
-				breadcrumb.append(folders[int(x) - 1][1])
+				hr()
+				print_breadcrumb(breadcrumb);
+				hr()
+				folders = list_folder(sess, folderids[-1])
+				hr()
+				x = input("(b)ack/(d)ownload/(r)ecursive download/(q)uit/[number]: ")
+
+				if x == "b":
+					if len(folderids) > 1:
+						folderids.pop()
+						breadcrumb.pop()
+					else:
+						break
+				elif x == "d":
+					clear()
+					download_folder(sess, folderids[-1], breadcrumb)
+					print("Finished.")
+					x = input("Press any key...")
+				elif x == "r":
+					clear()
+					download_folder(sess, folderids[-1], breadcrumb, True)
+					print("Finished.")
+					x = input("Press any key...")
+				elif x == "q":
+					exit()
+				else:
+					folderids.append(folders[int(x) - 1][0])
+					breadcrumb.append(folders[int(x) - 1][1])
