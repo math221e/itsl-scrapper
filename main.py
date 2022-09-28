@@ -248,7 +248,7 @@ if __name__ == "__main__":
 					clear()
 					download_folder(sess, folderids[-1], breadcrumb, True)
 					print("Finished.")
-					x = input("Press any key...")
+					x = input("Press enter...")
 				elif x == "q":
 					exit()
 				else:
