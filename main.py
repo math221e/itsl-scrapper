@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import requests
 import os
 import getpass
@@ -114,7 +115,7 @@ def login(sess):
 
 def select_course(sess):
 	r = sess.get("https://sdu.itslearning.com/TopMenu/TopMenu/GetCourses")
-	
+
 	courses = BeautifulSoup(r.text, "html.parser")
 	courses = courses.find_all("li")
 
@@ -156,7 +157,7 @@ def download_folder(sess, folderid, breadcrumb, recursive = False):
 
 		if link is None:
 			continue
-		
+
 		img = tds[0].find("img")
 
 		if img is None:
@@ -187,10 +188,10 @@ def download_folder(sess, folderid, breadcrumb, recursive = False):
 		href = link.get("href")
 		r = sess.get("https://resource.itslearning.com" + href)
 		print("Saving: ", path + filename)
-		
+
 		with open(path + filename, "wb") as f:
 			f.write(r.content)
-		
+
 
 def print_breadcrumb(breadcrumb):
 	print("Path: ", end="")
