@@ -61,11 +61,11 @@ def list_folder(sess, folderid):
 
 
 def is_logged_in(sess):
-	r = sess.get("https://sdu.itslearning.com/Person/ChangeDetails.aspx")
+	r = sess.get("https://sdu.itslearning.com/main.aspx?TextURL=%2fEditProfile")
 	soup = BeautifulSoup(r.text, "html.parser")
 	title = soup.find("title")
 
-	if title.text != "":
+	if title.text.strip() != "":
 		return True
 
 	return False
