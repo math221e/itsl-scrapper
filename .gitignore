@@ -1,3 +1,4 @@
 .DS_Store
 session_cache
 downloads
+__pycache__

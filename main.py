@@ -4,6 +4,7 @@ import os
 import getpass
 import pickle
 import time
+import sys
 from bs4 import BeautifulSoup
 
 url = "https://sdu.itslearning.com"
@@ -187,6 +188,7 @@ def download_folder(sess, folderid, breadcrumb, recursive = False):
 
 		href = link.get("href")
 		r = sess.get("https://resource.itslearning.com" + href)
+		print(href)
 		print("Saving: ", path + filename)
 
 		with open(path + filename, "wb") as f:
@@ -209,6 +211,9 @@ def hr():
 
 if __name__ == "__main__":
 	clear()
+
+	for i, arg in enumerate(sys.argv):
+		print(f"Argument {i:>6}: {arg}")
 
 	if not os.path.exists("downloads"):
 		os.makedirs("downloads")
